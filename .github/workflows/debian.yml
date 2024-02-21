@@ -1,8 +1,8 @@
 name: Debian images
-on:
-  push:
-    tags:
-      - debian-*
+# on:
+#   push:
+#     tags:
+#       - debian-*
 env:
   DEB_REPO: http://mirrors.edge.kernel.org/debian
 jobs:
