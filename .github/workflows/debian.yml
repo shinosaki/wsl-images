@@ -20,7 +20,7 @@ jobs:
       - run: sudo apt install -y debootstrap
 
       - name: Debootstrap
-        run: debootstrap --arch ${{ matrix.arch }} ${DEB_SUITE} ${TARGET_DIR} ${DEB_REPO}
+        run: sudo debootstrap --arch ${{ matrix.arch }} ${DEB_SUITE} ${TARGET_DIR} ${DEB_REPO}
 
       - name: Create tar file
         run: tar -C ${TARGET_DIR} -czf ${OUTPUT_NAME}.tar.gz .
