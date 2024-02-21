@@ -12,8 +12,6 @@ jobs:
         arch: [amd64, arm64]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
       - run: echo "DEB_SUITE=${GITHUB_REF_NAME#debian-}" >> $GITHUB_ENV
       - run: echo "TARGET_DIR=${DEB_SUITE}-${{ matrix.arch }}" >> $GITHUB_ENV
       - run: echo "OUTPUT_NAME=debian-${DEB_SUITE}-${{ matrix.arch }}" >> $GITHUB_ENV
