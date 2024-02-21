@@ -4,7 +4,7 @@ on:
     tags:
       - debian-*
 env:
-  DEB_REPO: http://mirrors.edge.kernel.org/debian
+  # DEB_REPO: http://mirrors.edge.kernel.org/debian
 jobs:
   build:
     strategy:
