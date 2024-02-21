@@ -1,0 +1,50 @@
+name: Debian images
+on:
+  push:
+    tags:
+      - debian-*
+env:
+  DEB_REPO: http://mirrors.edge.kernel.org/debian
+jobs:
+  build:
+    strategy:
+      matrix:
+        arch: [amd64, arm64]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - run: echo "DEB_SUITE=${GITHUB_REF_NAME#debian-}" >> $GITHUB_ENV
+      - run: echo "TARGET_DIR=${DEB_SUITE}-${{ matrix.arch }}" >> $GITHUB_ENV
+      - run: echo "OUTPUT_NAME=debian-${DEB_SUITE}-${{ matrix.arch }}" >> $GITHUB_ENV
+
+      - run: sudo apt update
+      - run: sudo apt install -y debootstrap
+
+      - name: Debootstrap
+        run: debootstrap --arch ${{ matrix.arch }} ${DEB_SUITE} ${TARGET_DIR} ${DEB_REPO}
+
+      - name: Create tar file
+        run: tar -C ${TARGET_DIR} -czf ${OUTPUT_NAME}.tar.gz .
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-${{ matrix.arch }}
+          path: ./*.tar.gz
+
+  release:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: build-*
+          merge-multiple: true
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          # draft: true
+          files: ./*.tar.gz
