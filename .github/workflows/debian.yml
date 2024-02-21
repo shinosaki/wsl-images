@@ -1,6 +1,6 @@
 name: Debian images
-# on:
-#   push:
+on:
+  push:
 #     tags:
 #       - debian-*
 env:
