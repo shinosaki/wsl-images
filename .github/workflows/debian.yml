@@ -24,7 +24,7 @@ jobs:
           echo "OUTPUT_NAME=debian-${DEB_SUITE}-${{ matrix.arch }}" >> $GITHUB_ENV
 
       - name: Build debootstrap docker image
-        run: docker build -t debootstrap ./debian/Dockerfile
+        run: docker build -t debootstrap ./debian
 
       - name: Debootstrap
         run: |
