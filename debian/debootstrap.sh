@@ -1,4 +1,8 @@
 #!/bin/bash
+echo "ARCH: $ARCH"
+echo "DEB_SUITE: $DEB_SUITE"
+echo "DEB_REPO: $DEB_REPO"
+
 debootstrap \
   --arch $ARCH $DEB_SUITE \
   --include=dbus-user-session \
