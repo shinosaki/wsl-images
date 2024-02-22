@@ -20,8 +20,7 @@ jobs:
           platforms: ${{ matrix.arch }}
 
       - run: |
-          TAG=${GITHUB_REF_NAME}
-          TAG=${TAG#*-}; TAG=${TAG%-*}
+          TAG=$(echo ${GITHUB_REF_NAME} | awk -F'-' '{print $2}')
           echo "DEB_SUITE=${TAG}" >> $GITHUB_ENV
 
       - name: Build debootstrap docker image
