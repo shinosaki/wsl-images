@@ -19,9 +19,7 @@ jobs:
         with:
           platforms: ${{ matrix.arch }}
 
-      - run: |
-          TAG=$(echo ${GITHUB_REF_NAME} | awk -F'-' '{print $2}')
-          echo "DEB_SUITE=${TAG}" >> $GITHUB_ENV
+      - run: echo "DEB_SUITE=$(echo ${GITHUB_REF_NAME} | awk -F'-' '{print $2}')" >> $GITHUB_ENV
 
       - name: Build debootstrap docker image
         run: docker build -t debootstrap ./debian
