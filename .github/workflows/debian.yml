@@ -1,5 +1,6 @@
 name: Debian images
 on:
+  workflow_dispatch:
   push:
     tags:
       - debian-*
