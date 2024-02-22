@@ -4,7 +4,7 @@ on:
   push:
     tags:
       - debian-*
-env:
+# env:
   # DEB_REPO: http://mirrors.edge.kernel.org/debian
 jobs:
   build:
