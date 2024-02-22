@@ -29,11 +29,11 @@ jobs:
       - name: Debootstrap
         run: |
           docker run --rm \
-            -e ARCH=${{ matrix.arch }}
-            -e DEB_SUITE
-            -e DEB_REPO
-            -e OUTPUT_NAME
-            -v ${PWD}:/build
+            -e ARCH=${{ matrix.arch }} \
+            -e DEB_SUITE \
+            -e DEB_REPO \
+            -e OUTPUT_NAME \
+            -v ${PWD}:/build \
             debootstrap
 
       - name: Upload artifact
