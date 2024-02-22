@@ -19,9 +19,7 @@ jobs:
         with:
           platforms: ${{ matrix.arch }}
 
-      - run: |
-          echo "DEB_SUITE=${GITHUB_REF_NAME#debian-}" >> $GITHUB_ENV
-          echo "OUTPUT_NAME=debian-${DEB_SUITE}-${{ matrix.arch }}" >> $GITHUB_ENV
+      - run: echo "DEB_SUITE=${GITHUB_REF_NAME#debian-}" >> $GITHUB_ENV
 
       - name: Build debootstrap docker image
         run: docker build -t debootstrap ./debian
@@ -32,7 +30,6 @@ jobs:
             -e ARCH=${{ matrix.arch }} \
             -e DEB_SUITE \
             -e DEB_REPO \
-            -e OUTPUT_NAME \
             -v ${PWD}:/build \
             debootstrap
 
