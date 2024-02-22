@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     tags:
-      - debian-*
+      - debian-*-*
 # env:
   # DEB_REPO: http://mirrors.edge.kernel.org/debian
 jobs:
@@ -19,7 +19,10 @@ jobs:
         with:
           platforms: ${{ matrix.arch }}
 
-      - run: echo "DEB_SUITE=${GITHUB_REF_NAME#debian-}" >> $GITHUB_ENV
+      - run: |
+          TAG=${GITHUB_REF_NAME}
+          TAG=${TAG#*-}; TAG=${TAG%-*}
+          echo "DEB_SUITE=${TAG}" >> $GITHUB_ENV
 
       - name: Build debootstrap docker image
         run: docker build -t debootstrap ./debian
