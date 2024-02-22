@@ -12,18 +12,28 @@ jobs:
         arch: [amd64, arm64]
     runs-on: ubuntu-latest
     steps:
-      - run: echo "DEB_SUITE=${GITHUB_REF_NAME#debian-}" >> $GITHUB_ENV
-      - run: echo "TARGET_DIR=${DEB_SUITE}-${{ matrix.arch }}" >> $GITHUB_ENV
-      - run: echo "OUTPUT_NAME=debian-${DEB_SUITE}-${{ matrix.arch }}" >> $GITHUB_ENV
+      - uses: actions/checkout@v4
 
-      - run: sudo apt update
-      - run: sudo apt install -y debootstrap
+      - uses: docker/setup-qemu-action@v3
+        with:
+          platforms: ${{ matrix.arch }}
+
+      - run: |
+          echo "DEB_SUITE=${GITHUB_REF_NAME#debian-}" >> $GITHUB_ENV
+          echo "OUTPUT_NAME=debian-${DEB_SUITE}-${{ matrix.arch }}" >> $GITHUB_ENV
+
+      - name: Build debootstrap docker image
+        run: docker build -t debootstrap ./debian/Dockerfile
 
       - name: Debootstrap
-        run: sudo debootstrap --arch ${{ matrix.arch }} ${DEB_SUITE} ${TARGET_DIR} ${DEB_REPO}
-
-      - name: Create tar file
-        run: tar -C ${TARGET_DIR} -czf ${OUTPUT_NAME}.tar.gz .
+        run: |
+          docker run --rm \
+            -e ARCH=${{ matrix.arch }}
+            -e DEB_SUITE
+            -e DEB_REPO
+            -e OUTPUT_NAME
+            -v ${PWD}:/build
+            debootstrap
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
