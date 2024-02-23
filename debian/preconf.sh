@@ -25,6 +25,7 @@ EOF
 chroot /work /bin/bash << 'EOF'
 adduser --disabled-password --gecos "" user
 adduser user sudo
+echo -e "pass" | passwd user
 
 echo -e "[boot]\nsystemd=true\n[user]\ndefault=user" > /etc/wsl.conf
 

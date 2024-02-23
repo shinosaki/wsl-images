@@ -15,6 +15,8 @@ Running on Windows Terminal
 ## Images
 
 **"Preconf" images are optimized for WSL. (Recommended)** ([For more information](https://github.com/shinosaki/wsl-images/issues/2))
+- Default username: `user`
+- Default password: `pass`
 
 ### Debian
 | Version | Build Date | Download Links |
