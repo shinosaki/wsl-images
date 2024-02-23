@@ -38,7 +38,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: build-${{ matrix.arch }}
+          name: build-${{ matrix.arch }}-${{ matrix.preconf }}
           path: ./*.tar.gz
 
   release:
