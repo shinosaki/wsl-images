@@ -37,6 +37,5 @@ sed -i -e "s/# ${LANG} UTF-8/${LANG} UTF-8/" /etc/locale.gen \
 && dpkg-reconfigure -f noninteractive locales \
 && update-locale LANG=${LANG}
 EOF
-fi
 
 tar -C /work -czf /build/${OUTPUT_NAME}-preconf.tar.gz .
