@@ -11,6 +11,7 @@ jobs:
     strategy:
       matrix:
         arch: [amd64, arm64]
+        preconf: [enable, disable]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -30,6 +31,7 @@ jobs:
             -e ARCH=${{ matrix.arch }} \
             -e DEB_SUITE \
             -e DEB_REPO \
+            -e PRE_CONF=${{ matrix.preconf }} \
             -v ${PWD}:/build \
             debootstrap
 

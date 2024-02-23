@@ -1,12 +1,65 @@
 #!/bin/bash
-echo "ARCH: $ARCH"
-echo "DEB_SUITE: $DEB_SUITE"
-echo "DEB_REPO: $DEB_REPO"
+echo "ARCH: ${ARCH}"
+echo "DEB_SUITE: ${DEB_SUITE}"
+echo "DEB_REPO: ${DEB_REPO}"
+echo "PRE_CONF: ${PRE_CONF}"
+
+OUTPUT_NAME="debian-${DEB_SUITE}-${ARCH}-$(date '+%Y%m%d')"
+INCLUDES="dbus,dbus-user-session"
+
+if [[ ${PRE_CONF} == "enable" ]]; then
+  OUTPUT_NAME="${OUTPUT_NAME}-preconf"
+
+  ## https://yabutan.com/posts/201116_bash_how_to_join_array
+  INCLUDES=(
+    dbus
+    dbus-user-session
+    bash-completion
+    ca-certificates
+    curl
+    gnupg
+    locales
+    sudo
+    wget
+  )
+  INCLUDES=$(printf ",%s" "${INCLUDES[@]}")
+  INCLUDES=${INCLUDES:1}
+fi
 
 debootstrap \
-  --arch $ARCH \
-  --include=dbus-user-session \
-  $DEB_SUITE \
-  ./work $DEB_REPO
+  --arch ${ARCH} \
+  --include=${INCLUDES} \
+  ${DEB_SUITE} \
+  /work ${DEB_REPO}
 
-tar -C ./work -czf /build/debian-$DEB_SUITE-$ARCH-$(date '+%Y%m%d').tar.gz .
+if [[ ${PRE_CONF} == "enable" ]]; then
+  chroot /work /bin/bash
+    ## https://stackoverflow.com/a/27921346
+    cat << 'EOF' >> /etc/skel/.bashrc
+
+
+## User Settings
+# Keep working directory when cloning terminal in WSL
+if command -v wslpath &> /dev/null; then
+  PROMPT_COMMAND=${PROMPT_COMMAND:+"$PROMPT_COMMAND; "}'printf "\e]9;9;%s\e\\" "$(wslpath -w "$PWD")"'
+fi
+# system32
+export PATH="/mnt/c/Windows/system32:$PATH"
+EOF
+  
+    adduser --disabled-password --gecos "" user
+    adduser user sudo
+
+    echo -e "[boot]\nsystemd=true\n[user]\ndefault=user" > /etc/wsl.conf
+
+    echo "Etc/UTC" > /etc/timezone \
+    && dpkg-reconfigure -f noninteractive tzdata
+
+    ## https://serverfault.com/a/801162
+    LANG=en_US.UTF-8
+    sed -i -e "s/# ${LANG} UTF-8/${LANG} UTF-8/" /etc/locale.gen \
+    && dpkg-reconfigure -f noninteractive locales \
+    && update-locale LANG=${LANG}
+fi
+
+tar -C /work -czf /build/${OUTPUT_NAME}.tar.gz .
