@@ -33,9 +33,8 @@ debootstrap \
   /work ${DEB_REPO}
 
 if [[ ${PRE_CONF} == "enable" ]]; then
-  chroot /work /bin/bash
-    ## https://stackoverflow.com/a/27921346
-    cat << 'EOF' >> /etc/skel/.bashrc
+  ## https://stackoverflow.com/a/27921346
+  cat << 'EOF' >> /work/etc/skel/.bashrc
 
 
 ## User Settings
@@ -46,7 +45,8 @@ fi
 # system32
 export PATH="/mnt/c/Windows/system32:$PATH"
 EOF
-  
+
+    chroot /work /bin/bash << 'EOF'
     adduser --disabled-password --gecos "" user
     adduser user sudo
 
@@ -60,6 +60,7 @@ EOF
     sed -i -e "s/# ${LANG} UTF-8/${LANG} UTF-8/" /etc/locale.gen \
     && dpkg-reconfigure -f noninteractive locales \
     && update-locale LANG=${LANG}
+EOF
 fi
 
 tar -C /work -czf /build/${OUTPUT_NAME}.tar.gz .
