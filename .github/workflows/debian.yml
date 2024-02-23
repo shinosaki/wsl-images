@@ -40,6 +40,7 @@ jobs:
           path: ./*.tar.gz
   
   preconf:
+    needs: build
     strategy:
       matrix:
         arch: [amd64, arm64]
@@ -78,7 +79,7 @@ jobs:
 
   release:
     runs-on: ubuntu-latest
-    needs: build
+    needs: [build, preconf]
     steps:
       - name: Download all artifacts
         uses: actions/download-artifact@v4
