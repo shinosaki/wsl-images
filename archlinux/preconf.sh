@@ -4,7 +4,6 @@ echo "REPO: ${REPO}"
 
 OUTPUT_NAME="archlinux-${ARCH}-$(date '+%Y%m%d')"
 
-mkdir /mnt
 tar -C /mnt -xzf /build/${OUTPUT_NAME}.tar.gz
 
 cat << 'EOF' >> /mnt/etc/skel/.bashrc
