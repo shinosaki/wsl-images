@@ -11,7 +11,6 @@ jobs:
     strategy:
       matrix:
         arch: [amd64, arm64]
-        preconf: [enable, disable]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -31,14 +30,50 @@ jobs:
             -e ARCH=${{ matrix.arch }} \
             -e DEB_SUITE \
             -e DEB_REPO \
-            -e PRE_CONF=${{ matrix.preconf }} \
             -v ${PWD}:/build \
             debootstrap
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: build-${{ matrix.arch }}-${{ matrix.preconf }}
+          name: build-${{ matrix.arch }}
+          path: ./*.tar.gz
+  
+  preconf:
+    strategy:
+      matrix:
+        arch: [amd64, arm64]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-${{ matrix.arch }}
+
+      - uses: docker/setup-qemu-action@v3
+        with:
+          platforms: ${{ matrix.arch }}
+
+      - run: echo "DEB_SUITE=$(echo ${GITHUB_REF_NAME} | awk -F'-' '{print $2}')" >> $GITHUB_ENV
+
+      - name: Build debootstrap docker image
+        run: docker build -t debootstrap ./debian
+
+      - name: Preconf
+        run: |
+          docker run --rm \
+            -e ARCH=${{ matrix.arch }} \
+            -e DEB_SUITE \
+            -e DEB_REPO \
+            -v ${PWD}:/build \
+            debootstrap /preconf.sh
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-${{ matrix.arch }}-prebuild
           path: ./*.tar.gz
 
   release:
