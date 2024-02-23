@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DATE=$(date '+%Y%m%d')
+DATE=$(date '+%y%m%d')
 
 ## Debian
 for i in buster bullseye bookworm; do
