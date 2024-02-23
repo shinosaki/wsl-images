@@ -1,0 +1,59 @@
+name: Archlinux images
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - archlinux-*
+# env:
+  # REPO: http://mirrors.edge.kernel.org/archlinux
+jobs:
+  build:
+    strategy:
+      matrix:
+        arch: [amd64, arm64]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-qemu-action@v3
+        with:
+          platforms: ${{ matrix.arch }}
+
+      - name: Build pacstrap docker image
+        run: docker build -t pacstrap ./archlinux
+
+      - name: Pacstrap
+        run: |
+          docker run --rm --privileged \
+            -e ARCH=${{ matrix.arch }} \
+            -v ${PWD}:/build \
+            pacstrap
+
+      - name: Pacstrap (preconf)
+        run: |
+          docker run --rm --privileged \
+            -e ARCH=${{ matrix.arch }} \
+            -v ${PWD}:/build \
+            pacstrap /preconf.sh
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-${{ matrix.arch }}
+          path: ./*.tar.gz
+
+  release:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: build-*
+          merge-multiple: true
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          # draft: true
+          files: ./*.tar.gz
