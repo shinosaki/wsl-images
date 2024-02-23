@@ -20,7 +20,7 @@ EOF
 
 arch-chroot /mnt /bin/bash << 'EOF'
 useradd -m -g wheel -s /bin/bash user
-echo -e "pass" | passwd user
+echo "pass" | passwd --stdin user
 
 echo -e "[boot]\nsystemd=true\n[user]\ndefault=user" > /etc/wsl.conf
 
